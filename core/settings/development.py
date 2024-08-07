@@ -17,4 +17,11 @@ DATABASES = {
     }
 }
 
+MEDIA_ROOT = BASE_DIR / "mediafiles"
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'example@example.com'
+
+CORS_ORIGIN_ALLOW_ALL = True

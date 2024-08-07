@@ -26,6 +26,8 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'your_email_user'
 EMAIL_HOST_PASSWORD = 'your_email_password'
 
+# DEFAULT_FROM_EMAIL = 'example@example.com'
+
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True

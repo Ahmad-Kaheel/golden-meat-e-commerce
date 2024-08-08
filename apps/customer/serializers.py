@@ -7,6 +7,11 @@ from customer.exceptions import (
     AccountDisabledException,
     InvalidCredentialsException,
 )
+from customer.models import Profile
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
 
 class UserRegistrationSerializer(RegisterSerializer):
     """
@@ -81,3 +86,39 @@ class UserLoginSerializer(serializers.Serializer):
 
         validated_data["user"] = user
         return validated_data
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    """
+    Serializer class to serialize the user Profile model
+    """
+
+    class Meta:
+        model = Profile
+        fields = (
+            "avatar",
+            "bio",
+            "created_at",
+            "updated_at",
+        )
+
+
+class UserSerializer(serializers.ModelSerializer):
+    """
+    Serializer class to seralize User model
+    """
+
+    profile = ProfileSerializer(read_only=True)
+    # addresses = AddressReadOnlySerializer(read_only=True, many=True)
+
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "is_active",
+            "profile",
+            # "addresses",
+        )

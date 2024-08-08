@@ -5,7 +5,12 @@ from .base import *
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+
+
+REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'] += (
+    'rest_framework.authentication.SessionAuthentication',
+)
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

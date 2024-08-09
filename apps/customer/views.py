@@ -44,40 +44,6 @@ User = get_user_model()
             description='Bad Request - Validation errors for the provided data.'
         ),
     },
-    parameters=[
-        OpenApiParameter(
-            name='email',
-            description='The email address of the user.',
-            required=True,
-            type=str
-        ),
-        OpenApiParameter(
-            name='password1',
-            description='Password for the account.',
-            required=True,
-            type=str,
-            style={"input_type": "password"}
-        ),
-        OpenApiParameter(
-            name='password2',
-            description='Confirmation of the password.',
-            required=True,
-            type=str,
-            style={"input_type": "password"}
-        ),
-        OpenApiParameter(
-            name='first_name',
-            description='First name of the user.',
-            required=True,
-            type=str
-        ),
-        OpenApiParameter(
-            name='last_name',
-            description='Last name of the user.',
-            required=True,
-            type=str
-        ),
-    ],
 )
 class UserRegisterationAPIView(RegisterView):
     """
@@ -136,21 +102,6 @@ class UserRegisterationAPIView(RegisterView):
             description='Unauthorized - Authentication failed.'
         ),
     },
-    parameters=[
-        OpenApiParameter(
-            name='email',
-            description='The email of the user.',
-            required=True,
-            type=str
-        ),
-        OpenApiParameter(
-            name='password',
-            description='The password of the user.',
-            required=True,
-            type=str,
-            style={"input_type": "password"}
-        ),
-    ],
 )
 class UserLoginAPIView(LoginView):
     """
@@ -170,22 +121,6 @@ class UserLoginAPIView(LoginView):
                 description='Unauthorized - Invalid or missing access token.'
             ),
         },
-        parameters=[
-            OpenApiParameter(
-                name='Authorization',
-                description='Bearer access token to authorize the request',
-                required=True,
-                type=str,
-                location=OpenApiParameter.HEADER,
-                examples=[
-                    OpenApiExample(
-                        'Example Token',
-                        summary='Valid Bearer Token',
-                        value='Bearer <access_token>'
-                    )
-                ]
-            ),
-        ],
     ),
     put=extend_schema(
         summary='Update User Profile',
@@ -203,22 +138,6 @@ class UserLoginAPIView(LoginView):
                 description='Forbidden - User does not have permission to update this profile.'
             ),
         },
-        parameters=[
-            OpenApiParameter(
-                name='Authorization',
-                description='Bearer access token to authorize the request',
-                required=True,
-                type=str,
-                location=OpenApiParameter.HEADER,
-                examples=[
-                    OpenApiExample(
-                        'Example Token',
-                        summary='Valid Bearer Token',
-                        value='Bearer <access_token>'
-                    )
-                ]
-            ),
-        ],
     ),
     patch=extend_schema(
         summary='Partially Update User Profile',
@@ -236,22 +155,6 @@ class UserLoginAPIView(LoginView):
                 description='Forbidden - User does not have permission to update this profile.'
             ),
         },
-        parameters=[
-            OpenApiParameter(
-                name='Authorization',
-                description='Bearer access token to authorize the request',
-                required=True,
-                type=str,
-                location=OpenApiParameter.HEADER,
-                examples=[
-                    OpenApiExample(
-                        'Example Token',
-                        summary='Valid Bearer Token',
-                        value='Bearer <access_token>'
-                    )
-                ]
-            ),
-        ],
     ),
 )
 class ProfileAPIView(RetrieveUpdateAPIView):
@@ -278,22 +181,6 @@ class ProfileAPIView(RetrieveUpdateAPIView):
                 description='Unauthorized - Invalid or missing access token.'
             ),
         },
-        parameters=[
-            OpenApiParameter(
-                name='Authorization',
-                description='Bearer access token to authorize the request',
-                required=True,
-                type=str,
-                location=OpenApiParameter.HEADER,
-                examples=[
-                    OpenApiExample(
-                        'Example Token',
-                        summary='Valid Bearer Token',
-                        value='Bearer <access_token>'
-                    )
-                ]
-            ),
-        ],
     )
 )
 class UserAPIView(RetrieveAPIView):

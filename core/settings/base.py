@@ -1,7 +1,9 @@
 
+import os
 import sys
 from pathlib import Path
 from datetime import timedelta
+from decouple import Csv, config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -11,9 +13,7 @@ sys.path.append(str(PARENT_DIR / 'apps'))
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-s=vd=sb)%-n6#5co^a6v0rhaa##mkxr26bjrb3^%mu^mwot_o3'
-
-
+SECRET_KEY = config("SECRET_KEY")
 
 
 # Application definition
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 ]
 
 SITE_ID = 1
+CORS_ALLOW_CREDENTIALS = True
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -97,6 +98,36 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+# Database
+# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+
+DB_ENGINE = config("DB_ENGINE", default="django.db.backends.sqlite3")
+DB_NAME = config("DB_NAME", default=os.path.join(BASE_DIR, "db.sqlite3"))
+DB_USER = config("DB_USERNAME", default="")
+DB_PASSWORD = config("DB_PASSWORD", default="")
+DB_HOST = config("DB_HOSTNAME", default="")
+DB_PORT = config("DB_PORT", default="")
+
+# إعداد قاعدة البيانات
+if DB_ENGINE == "django.db.backends.postgresql" and all([DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT]):
+    DATABASES = {
+        "default": {
+            "ENGINE": DB_ENGINE,
+            "NAME": DB_NAME,
+            "USER": DB_USER,
+            "PASSWORD": DB_PASSWORD,
+            "HOST": DB_HOST,
+            "PORT": DB_PORT,
+        }
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        }
+    }
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -194,3 +225,27 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
+
+
+
+# login
+"""
+
+{
+	"email": "amin1@amin.com",
+	"password": "123qweasd_"
+}
+
+
+"""
+
+"""
+{
+    "email": "amin1@amin.com",
+    "password1": "123qweasd_",
+    "password2": "123qweasd_",
+    "first_name": "amin1",
+    "last_name": "amin1"
+}
+
+"""

@@ -1,0 +1,144 @@
+.venv
+.git
+.gitignore
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Packages
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg-info/
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+pytestdebug.log
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.pyo
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+
+# If you are using MySQL, PostgreSQL or other DBs, include these:
+*.db
+*.sql
+*.bak
+
+# Ignore virtual environment directories:
+env/
+venv/
+ENV/
+VENV/
+env.bak/
+venv.bak/
+
+# Ignore development and temporary files:
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env.*
+.local
+.pytest_cache/
+.mypy_cache/
+.sass-cache/
+.idea/
+.vscode/
+*.swp
+*.swo
+*.tmp
+*.DS_Store
+Thumbs.db
+*.bak
+*.orig
+*.lock
+
+# Docker-specific files:
+docker-compose.override.yml
+docker-compose.debug.yml
+
+# Documentation files:
+docs/
+*.rst
+README.md
+LICENSE
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Thumbnails
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.ico
+*.svg
+*.tiff
+*.tif
+*.webp
+
+# macOS-specific files:
+._*
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.vol
+
+# Windows-specific files:
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# Ignore any additional files specific to your project:
+.ignore-this

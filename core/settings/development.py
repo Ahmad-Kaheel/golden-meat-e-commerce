@@ -1,30 +1,23 @@
-# core/settings/development.py
-
+import os
 from .base import *
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv())
 
 
 REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'] += (
     'rest_framework.authentication.SessionAuthentication',
 )
 
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "../", "mediafiles")
 
-MEDIA_ROOT = BASE_DIR / "mediafiles"
+STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "../", "staticfiles")
 
-STATIC_ROOT = BASE_DIR / "staticfiles"
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'example@example.com'

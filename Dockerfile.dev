@@ -8,8 +8,9 @@ WORKDIR /code
 COPY ./djrequirements.txt .
 
 RUN apt-get update -y && \
-    apt-get install -y build-essential\
-    pip install --upgrade pip && \
+    apt-get install -y build-essential
+
+RUN pip install --upgrade pip && \
     pip install -r djrequirements.txt
 
 COPY ./entrypoint.dev.sh /code/entrypoint.sh

@@ -3,6 +3,7 @@ from rest_framework import serializers
 from django.contrib.auth import authenticate, get_user_model
 from django.utils.translation import gettext_lazy as _
 
+from address.serializers import AddressReadOnlySerializer
 from customer.exceptions import (
     AccountDisabledException,
     InvalidCredentialsException,
@@ -109,7 +110,7 @@ class UserSerializer(serializers.ModelSerializer):
     """
 
     profile = ProfileSerializer(read_only=True)
-    # addresses = AddressReadOnlySerializer(read_only=True, many=True)
+    addresses = AddressReadOnlySerializer(read_only=True, many=True)
 
     class Meta:
         model = User
@@ -120,5 +121,5 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "is_active",
             "profile",
-            # "addresses",
+            "addresses",
         )

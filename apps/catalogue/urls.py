@@ -1,14 +1,14 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from catalogue.views import ProductCategoryViewSet, ProductViewSet, ProductFilterAPIView
+from catalogue.views import ProductCategoryViewSet, ProductViewSet, ProductFilterAPIView, ReviewViewSet
 
-app_name = "catalogues"
+app_name = "catalogue"
 
 router = DefaultRouter()
 router.register(r"categories", ProductCategoryViewSet)
+router.register(r'reviews', ReviewViewSet, basename='review')
 router.register(r"", ProductViewSet)
-# router.register(r"products", ProductFilterAPIView)
 
 
 urlpatterns = [

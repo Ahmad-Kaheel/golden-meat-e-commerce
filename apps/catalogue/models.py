@@ -131,6 +131,7 @@ class Product(models.Model):
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, verbose_name=_("Product"), on_delete=models.CASCADE, related_name='images')
     image_url = models.ImageField(_("Image URL"), upload_to=product_image_path, blank=True)
+    alt_text = models.CharField(_("Missing Image"), max_length=100)
 
     class Meta:
         verbose_name = _("Product Image")
@@ -198,3 +199,37 @@ class ProductRecommendation(models.Model):
         unique_together = ("primary", "recommendation")
         verbose_name = _("Product recommendation")
         verbose_name_plural = _("Product recomendations")
+
+
+
+class Review(models.Model):
+    ''' Field : user_id, product_id, rating, review '''
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("User"))
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name=_("Product"))
+    rating = models.IntegerField(verbose_name=_("Rating"), null=True, blank=True)
+    review = models.TextField(max_length=250, verbose_name=_("Review"))
+    parent = models.ForeignKey(
+        'self', 
+        on_delete=models.CASCADE, 
+        blank=True, null=True, 
+        related_name='reply', 
+        verbose_name=_("Parent Review")
+    )
+    verified = models.BooleanField(default=False, verbose_name=_("Verified"))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Created At"))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("Updated At"))
+
+    def __str__(self):
+        return self.user.email
+
+    @property
+    def children(self):
+        return Review.objects.filter(parent=self).reverse()
+
+    @property
+    def is_parent(self):
+        return self.parent is None
+
+    class Meta:
+        verbose_name = _("Review")
+        verbose_name_plural = _("Reviews")

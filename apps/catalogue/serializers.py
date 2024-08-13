@@ -1,12 +1,11 @@
 from rest_framework import serializers
 
+from django.utils.translation import gettext_lazy as _
+
 from catalogue.models import (
     Product,
     Category,
-    ProductImage,
-    ProductCountry,
-    ProductSpecification,
-    ProductRecommendation
+    Review,
 )
 
 
@@ -21,134 +20,125 @@ class ProductCategoryReadSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ProductRecommendationReadSerializer(serializers.ModelSerializer):
-    recommendation_title = serializers.CharField(source="recommendation.title", read_only=True)
-
-    class Meta:
-        model = ProductRecommendation
-        fields = ("recommendation", "recommendation_title", "ranking")
-
-
-class ProductSpecificationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductSpecification
-        fields = ['name', 'value']
-
-class ProductCountrySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductCountry
-        fields = ['country']
-
-class ProductImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductImage
-        fields = '__all__'
-
-
-
 class ProductReadSerializer(serializers.ModelSerializer):
-    """
-    Serializer class for reading products
-    """
-
-    category = serializers.CharField(source="category.name", read_only=True)
-    specifications = ProductSpecificationSerializer(many=True, read_only=True)
-    countries = ProductCountrySerializer(many=True, read_only=True)
-    images = ProductImageSerializer(many=True, read_only=True)
-    recommended_products = ProductRecommendationReadSerializer(source="primary_recommendations", many=True, read_only=True)
+    category_name = serializers.CharField(source="category.name", read_only=True)
+    specifications = serializers.SerializerMethodField()
+    countries = serializers.SerializerMethodField()
+    images = serializers.SerializerMethodField()
+    recommended_products = serializers.SerializerMethodField()
+    reviews = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = '__all__'
+        fields = (
+            'id',
+            'title',
+            'category_name',
+            'specifications',
+            'countries',
+            'images',
+            'recommended_products',
+            'reviews',
+            'price',
+            'description',
+        )
+
+    def get_specifications(self, obj):
+        return [
+            {
+                "name": spec.name,
+                "value": spec.value,
+            }
+            for spec in obj.specifications.all()
+        ]
+
+    def get_countries(self, obj):
+        return [
+            country.country.name
+            for country in obj.countries.all()
+        ]
+
+    def get_images(self, obj):
+        return [
+            {
+                "url": image.image_url.url,
+                "alt_text": image.alt_text,
+            }
+            for image in obj.images.all()
+        ]
+
+    def get_recommended_products(self, obj):
+        return [
+            {
+                "id": recommendation.recommendation.id,
+                "title": recommendation.recommendation.title,
+            }
+            for recommendation in obj.primary_recommendations.all()
+        ]
+
+    def get_reviews(self, obj):
+        return [
+            {
+                "user": review.user.email,
+                "rating": review.rating,
+                "review": review.review,
+                "created_at": review.created_at,
+                "updated_at": review.updated_at,
+                "verified": review.verified,
+                "replies": self.get_review_replies(review)
+            }
+            for review in obj.review_set.filter(parent=None)
+        ]
+
+    def get_review_replies(self, review):
+        return [
+            {
+                "user": reply.user.email,
+                "rating": reply.rating,
+                "review": reply.review,
+                "created_at": reply.created_at,
+                "updated_at": reply.updated_at,
+                "verified": reply.verified,
+            }
+            for reply in review.reply.all()
+        ]
 
 
+class ReviewSerializer(serializers.ModelSerializer):
+    user_email = serializers.SerializerMethodField()
+    product_title = serializers.SerializerMethodField()
 
+    class Meta:
+        model = Review
+        fields = [
+            'id', 'user_email', 'product_title', 'product', 'rating', 
+            'review', 'parent', 'verified', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['user_email', 'verified', 'product_title', 'created_at', 'updated_at']
 
+    def get_user_email(self, obj):
+        return obj.user.email
 
-# class ProductWriteSerializer(serializers.ModelSerializer):
-#     category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.browsable())
-#     images = serializers.PrimaryKeyRelatedField(queryset=ProductImage.objects.all(), many=True, required=False)
-#     countries = serializers.PrimaryKeyRelatedField(queryset=Country.objects.all(), many=True, required=False)
-#     specifications = serializers.DictField(child=serializers.CharField(), required=False)
-#     recommended_products = ProductRecommendationSerializer(many=True, required=False)
+    def get_product_title(self, obj):
+        return obj.product.title
 
-#     class Meta:
-#         model = Product
-#         fields = (
-#             "title",
-#             "description",
-#             "price",
-#             "quantity",
-#             "is_public",
-#             "category",
-#             "main_image_url",
-#             "parent",
-#             "rating",
-#             "images",
-#             "countries",
-#             "specifications",
-#             "recommended_products",
-#         )
+    def to_internal_value(self, data):
+        if 'parent' in data and data['parent'] in [0, '0', '', None]:
+            data['parent'] = None
+        
+        if data.get('parent') is not None:
+            data.pop('rating', None)
+        return super().to_internal_value(data)
 
-#     def create(self, validated_data):
-#         category = validated_data.pop("category")
-#         images_data = validated_data.pop("images", [])
-#         countries_data = validated_data.pop("countries", [])
-#         specifications_data = validated_data.pop("specifications", {})
-#         recommended_products_data = validated_data.pop("recommended_products", [])
+    def validate(self, attrs):
+        parent = attrs.get('parent')
+        product = attrs.get('product')
+        if parent and product and parent.product != product:
+            raise serializers.ValidationError(_("The review must refer to the same product of the parent review."))
+        return attrs
 
-#         product = Product.objects.create(**validated_data, category=category)
-
-#         for image_id in images_data:
-#             ProductImage.objects.create(product=product, image_url=image_id.image_url)
-
-#         for country_id in countries_data:
-#             ProductCountry.objects.create(product=product, country=country_id)
-
-#         for spec_name, spec_value in specifications_data.items():
-#             ProductSpecification.objects.create(product=product, name=spec_name, value=spec_value)
-
-#         for recommendation_data in recommended_products_data:
-#             ProductRecommendation.objects.create(
-#                 primary=product,
-#                 recommendation=recommendation_data['recommendation'],
-#                 ranking=recommendation_data['ranking']
-#             )
-
-#         return product
-
-#     def update(self, instance, validated_data):
-#         if "category" in validated_data:
-#             category = validated_data.pop("category")
-#             instance.category = category
-
-#         images_data = validated_data.pop("images", None)
-#         countries_data = validated_data.pop("countries", None)
-#         specifications_data = validated_data.pop("specifications", None)
-#         recommended_products_data = validated_data.pop("recommended_products", None)
-
-#         if images_data is not None:
-#             instance.images.all().delete()
-#             for image_id in images_data:
-#                 ProductImage.objects.create(product=instance, image_url=image_id.image_url)
-
-#         if countries_data is not None:
-#             instance.countries.all().delete()
-#             for country_id in countries_data:
-#                 ProductCountry.objects.create(product=instance, country=country_id)
-
-#         if specifications_data is not None:
-#             instance.specifications.all().delete()
-#             for spec_name, spec_value in specifications_data.items():
-#                 ProductSpecification.objects.create(product=instance, name=spec_name, value=spec_value)
-
-#         if recommended_products_data is not None:
-#             instance.primary_recommendations.all().delete()
-#             for recommendation_data in recommended_products_data:
-#                 ProductRecommendation.objects.create(
-#                     primary=instance,
-#                     recommendation=recommendation_data['recommendation'],
-#                     ranking=recommendation_data['ranking']
-#                 )
-
-#         return super().update(instance, validated_data)
+    def update(self, instance, validated_data):
+        instance.rating = validated_data.get('rating', instance.rating)
+        instance.review = validated_data.get('review', instance.review)
+        instance.save()
+        return instance

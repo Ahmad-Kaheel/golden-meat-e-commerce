@@ -7,7 +7,8 @@ from catalogue.models import (
     ProductSpecification,
     ProductRecommendation,
     Country,
-    ProductCountry
+    ProductCountry,
+    Review
 )
 
 admin.site.register(Category)
@@ -17,3 +18,4 @@ admin.site.register(ProductSpecification)
 admin.site.register(ProductRecommendation)
 admin.site.register(Country)
 admin.site.register(ProductCountry)
+admin.site.register(Review)

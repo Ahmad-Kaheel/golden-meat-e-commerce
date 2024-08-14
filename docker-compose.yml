@@ -8,21 +8,18 @@ services:
     command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
     volumes:
       - .:/code
-    env_file:
-      - ./.env
     ports:
       - 8000:8000
     depends_on:
       - db
   db:
-    image: postgres:13
+    image: postgres:alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=${DB_USERNAME}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
-      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=mypassword
+      - POSTGRES_DB=mydatabase
 
 volumes:
   postgres_data:

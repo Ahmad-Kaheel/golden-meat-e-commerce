@@ -1,4 +1,4 @@
-FROM python:3.10.2-slim-bullseye
+FROM python:3.8-slim
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK 1
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -6,12 +6,12 @@ ENV PYTHONUNBUFFERED 1
 
 WORKDIR /code
 
-COPY ./djrequirements.txt .
+COPY ./udjrequirements.txt .
 
 RUN apt-get update -y && \
-    apt-get install -y netcat-openbsd && \
+    apt-get install -y netcat-openbsd gcc python3-dev musl-dev tzdata libc6-dev  && \
     pip install --upgrade pip && \
-    pip install -r djrequirements.txt
+    pip install -r udjrequirements.txt
 
 COPY ./entrypoint.sh /code/entrypoint.sh
 RUN chown -R $USER:$USER /code/entrypoint.sh

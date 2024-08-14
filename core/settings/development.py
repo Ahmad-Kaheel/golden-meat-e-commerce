@@ -5,6 +5,8 @@ from .base import *
 # DEBUG = config("DEBUG", default=False, cast=bool)
 DEBUG = True
 
+SECRET_KEY = "fffffffffffdddddddddssssss$#AAAAsdfsdf123224gfffffd"
+
 # ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv())
 ALLOWED_HOSTS = []
 

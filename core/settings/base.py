@@ -39,6 +39,11 @@ INSTALLED_APPS = [
     'drf_spectacular',
     # local app
     "customer",
+    "address",
+    "catalogue",
+    "order",
+    "voucher",
+    "basket",
 
 ]
 
@@ -180,8 +185,8 @@ USER_MODEL_USERNAME_FIELD = 'email'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=10),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=40),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
@@ -219,11 +224,21 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'ecommerce',
-    'DESCRIPTION': 'ecommerce ecommerce ecommerce ecommerce',
+    'TITLE': 'Your API',
+    'DESCRIPTION': 'API description',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SECURITY': [
+        {
+            'BearerAuth': []
+        }
+    ],
+    'SWAGGER_UI_SETTINGS': {
+        'persistAuthorization': True,
+    },
 }
 
 
@@ -248,4 +263,19 @@ SPECTACULAR_SETTINGS = {
     "last_name": "amin1"
 }
 
+"""
+
+
+# address
+"""
+{
+  "city": "city1",
+  "street_address": "street1",
+  "apartment_address": "apartment1",
+  "postal_code": "postal1",
+  "is_default_for_billing": true,
+  "is_default_for_shipping": true,
+  "phone_number": "0099000990",
+  "notes": "ssssddddfff"
+}
 """

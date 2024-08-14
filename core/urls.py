@@ -5,14 +5,17 @@ from dj_rest_auth.views import (
     PasswordResetConfirmView,
     PasswordResetView,
 )
+from rest_framework_simplejwt.views import TokenVerifyView
+from dj_rest_auth.jwt_auth import get_refresh_view
+
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularSwaggerView,
     SpectacularRedocView
 )
 
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
+# from drf_yasg.views import get_schema_view
+# from drf_yasg import openapi
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -26,6 +29,8 @@ urlpatterns = [
     path('api/', include('apps.urls')),
 
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
+    path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path('token/refresh/', get_refresh_view().as_view(), name='token_refresh'),
     path(
         "resend-email/", ResendEmailVerificationView.as_view(), name="rest_resend_email"
     ),

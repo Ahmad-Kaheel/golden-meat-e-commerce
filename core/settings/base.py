@@ -112,7 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 DATABASES = {
     'default': {
         'ENGINE': "django.db.backends.postgresql",
-        'NAME': 'mydatabase',
+        'NAME': 'mydatabase', 
         'USER': 'myuser',
         'PASSWORD': 'mypassword',
         'HOST': "db",

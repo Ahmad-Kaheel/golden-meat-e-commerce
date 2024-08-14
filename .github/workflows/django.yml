@@ -12,26 +12,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      db:
-        image: postgres:alpine
-        env:
-          POSTGRES_USER: myuser
-          POSTGRES_PASSWORD: mypassword
-          POSTGRES_DB: mydatabase
-        options: >-
-          --health-cmd="pg_isready -U myuser"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-        ports:
-          - 5432:5432
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up Docker Compose
+    - name: Set up Docker
       run: |
         sudo apt-get update
         sudo apt-get install -y docker-compose
@@ -40,6 +25,7 @@ jobs:
       run: |
         docker-compose up --build -d
         docker-compose run web python manage.py migrate
+        docker-compose run web python manage.py test
 
     - name: Shut down services
       run: docker-compose down

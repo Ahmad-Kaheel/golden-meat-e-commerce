@@ -15,7 +15,7 @@ RUN apt-get update -y && \
 
 COPY ./entrypoint.sh /code/entrypoint.sh
 RUN chown -R $USER:$USER /code/entrypoint.sh
-RUN chmod a+x /code/entrypoint.sh
+RUN chmod x /code/entrypoint.sh
 
 COPY . .
 

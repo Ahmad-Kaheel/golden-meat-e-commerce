@@ -20,9 +20,9 @@ jobs:
           POSTGRES_PASSWORD: mypassword
           POSTGRES_DB: mydatabase
         options: >-
-          --health-cmd="pg_isready -U ${{ secrets.POSTGRES_USER }}" 
-          --health-interval=10s 
-          --health-timeout=5s 
+          --health-cmd="pg_isready -U myuser"
+          --health-interval=10s
+          --health-timeout=5s
           --health-retries=5
         ports:
           - 5432:5432

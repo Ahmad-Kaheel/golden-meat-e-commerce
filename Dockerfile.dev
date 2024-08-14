@@ -5,16 +5,16 @@ ENV PYTHONUNBUFFERED 1
 
 WORKDIR /code
 
-COPY ./djrequirements.txt .
+COPY ./udjrequirements.txt .
 
 RUN apt-get update -y && \
     apt-get install -y netcat-openbsd && \
     pip install --upgrade pip && \
-    pip install -r djrequirements.txt
+    pip install -r udjrequirements.txt
 
 COPY ./entrypoint.dev.sh /code/entrypoint.sh
 RUN chown -R $USER:$USER /code/entrypoint.sh
-RUN chmod a+x /code/entrypoint.sh
+RUN chmod +x /code/entrypoint.sh
 
 COPY . .
 

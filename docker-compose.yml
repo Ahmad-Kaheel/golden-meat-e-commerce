@@ -4,22 +4,9 @@ services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile
-    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000 --no-input
-    volumes:
-      - .:/code
+      dockerfile: Dockerfile.dev
     ports:
       - 8000:8000
-    depends_on:
-      - db
-  db:
-    image: postgres:alpine
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=mypassword
-      - POSTGRES_DB=mydatabase
-
-volumes:
-  postgres_data:
+      - DEBUG=1
+      - DJANGO_SETTINGS_MODULE=core.settings.development

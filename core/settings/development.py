@@ -27,13 +27,16 @@ DEFAULT_FROM_EMAIL = 'example@example.com'
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'mydatabase', 
-        'USER': 'myuser',
-        'PASSWORD': 'mypassword',
-        'HOST': "db",
-        'PORT': "5432",
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'mydatabase', 
+#         'USER': 'myuser',
+#         'PASSWORD': '',
+#         'HOST': "db",
+#         'PORT': "5432",
+#         'OPTIONS': {
+#             'service': 'db',
+#         }
+#     }
+# }

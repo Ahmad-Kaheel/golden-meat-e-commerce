@@ -62,8 +62,6 @@ class UserAddress(Address):
         _("Search text - used only for searching addresses"), editable=False
     )
     search_fields = [
-        "address_type",
-        "default",
         "city",
         "street_address",
         "apartment_address",
@@ -71,7 +69,7 @@ class UserAddress(Address):
     ]
     
     def __str__(self):
-        return f"{self.user.full_name()} - {self.city}, {self.street_address}"
+        return f"{self.user.get_full_name()} - {self.city}, {self.street_address}"
 
     def save(self, *args, **kwargs):
         # Ensure that each user only has one default shipping address
@@ -100,15 +98,21 @@ class UserAddress(Address):
     def clean(self):
         # Strip all whitespace
         for field in [
-        "address_type",
-        "default",
         "city",
         "street_address",
         "apartment_address",
         "postal_code",
-    ]:
+        ]:
             if self.__dict__[field]:
                 self.__dict__[field] = self.__dict__[field].strip()
     
     def _update_search_text(self):
         self.search_text = self.join_fields(self.search_fields, separator=" ")
+    
+    def join_fields(self, fields, separator=" "):
+        """
+        Helper method to concatenate specified fields into a single string.
+        """
+        return separator.join(
+            str(getattr(self, field, '')) for field in fields if getattr(self, field)
+        )

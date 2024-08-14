@@ -1,23 +1,53 @@
-from rest_framework import permissions, status
-from rest_framework.viewsets import ReadOnlyModelViewSet
-
+from rest_framework.generics import RetrieveUpdateAPIView, CreateAPIView
+from rest_framework.exceptions import PermissionDenied
 from django.utils.translation import gettext as _
-from django.contrib.auth import get_user_model
 
 from address.models import UserAddress
+from address.serializers import AddressSerializer
 from customer.permissions import IsUserAddressOwner
-from address.serializers import AddressReadOnlySerializer
+from rest_framework.permissions import IsAuthenticated
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiResponse
 
-class AddressViewSet(ReadOnlyModelViewSet):
+
+
+@extend_schema_view(
+    get=extend_schema(
+        tags=['User Address'],
+        summary='Retrieve User Address',
+        description='Retrieve the address associated with the authenticated user.'
+    ),
+    put=extend_schema(
+        tags=['User Address'],
+        summary='Update User Address',
+        description='Update the address associated with the authenticated user.'
+    ),
+    patch=extend_schema(
+        tags=['User Address'],
+        summary='Partially Update User Address',
+        description='Partially update the address associated with the authenticated user.'
+    ),
+    post=extend_schema(
+        tags=['User Address'],
+        summary='Create User Address',
+        description='Create a new address for the authenticated user.'
+    ),
+)
+class UserAddressAPIView(RetrieveUpdateAPIView, CreateAPIView):
     """
-    List and Retrieve user addresses
+    Get, Update, and Create user address
     """
 
     queryset = UserAddress.objects.all()
-    serializer_class = AddressReadOnlySerializer
-    permission_classes = (IsUserAddressOwner,)
+    serializer_class = AddressSerializer
+    permission_classes = [IsAuthenticated, IsUserAddressOwner]
 
-    def get_queryset(self):
-        res = super().get_queryset()
+    def get_object(self):
         user = self.request.user
-        return res.filter(user=user)
+        try:
+            address = self.queryset.get(user=user)
+        except UserAddress.DoesNotExist:
+            raise PermissionDenied(_("No address found for the authenticated user. Please create an address first."))
+        return address
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

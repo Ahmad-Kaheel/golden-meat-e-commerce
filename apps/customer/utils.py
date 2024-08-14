@@ -1,5 +1,3 @@
-
-
 def normalise_email(email):
     """
     The local part of an email address is case-sensitive, the domain part

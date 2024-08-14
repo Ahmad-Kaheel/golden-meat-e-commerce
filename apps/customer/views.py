@@ -1,6 +1,6 @@
 from dj_rest_auth.registration.views import RegisterView
 from dj_rest_auth.views import LoginView
-from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter, OpenApiResponse, extend_schema_view
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.response import Response
 from rest_framework import permissions, status
 from rest_framework.generics import (
@@ -22,28 +22,12 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
+
 @extend_schema(
+    tags=['User Management'],
     summary='User Registration',
     description='Register new users using email and password. Returns a message indicating whether a verification email has been sent.',
     request=UserRegistrationSerializer,
-    responses={
-        201: OpenApiResponse(
-            description='Successful registration. Verification email sent.',
-            response=UserRegistrationSerializer,
-            examples=[
-                OpenApiExample(
-                    'Successful Registration',
-                    summary='Example Response',
-                    value={
-                        "detail": "Verification e-mail sent."
-                    }
-                )
-            ]
-        ),
-        400: OpenApiResponse(
-            description='Bad Request - Validation errors for the provided data.'
-        ),
-    },
 )
 class UserRegisterationAPIView(RegisterView):
     """
@@ -70,38 +54,10 @@ class UserRegisterationAPIView(RegisterView):
 
 
 @extend_schema(
+    tags=['User Management'],
     summary='User Login',
     description='Authenticate users using email and password. Returns access and refresh tokens along with user details upon successful authentication.',
     request=UserLoginSerializer,
-    responses={
-        200: OpenApiResponse(
-            description='Successful authentication. Access and refresh tokens are returned along with user details.',
-            response=UserLoginSerializer,
-            examples=[
-                OpenApiExample(
-                    'Successful Login',
-                    summary='Example Response',
-                    value={
-                        "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
-                        "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
-                        "user": {
-                            "id": 1,
-                            "email": "user@example.com",
-                            "first_name": "John",
-                            "last_name": "Doe",
-                            "is_active": True
-                        }
-                    }
-                )
-            ]
-        ),
-        400: OpenApiResponse(
-            description='Bad Request - Invalid credentials provided.'
-        ),
-        401: OpenApiResponse(
-            description='Unauthorized - Authentication failed.'
-        ),
-    },
 )
 class UserLoginAPIView(LoginView):
     """
@@ -113,48 +69,21 @@ class UserLoginAPIView(LoginView):
 
 @extend_schema_view(
     get=extend_schema(
+        tags=['User Profile'],
         summary='Retrieve User Profile',
         description='Fetch the profile details of the authenticated user.',
-        responses={
-            200: ProfileSerializer,
-            401: OpenApiResponse(
-                description='Unauthorized - Invalid or missing access token.'
-            ),
-        },
     ),
     put=extend_schema(
+        tags=['User Profile'],
         summary='Update User Profile',
         description='Update the profile information of the authenticated user.',
         request=ProfileSerializer,
-        responses={
-            200: ProfileSerializer,
-            400: OpenApiResponse(
-                description='Bad Request - Invalid data provided.'
-            ),
-            401: OpenApiResponse(
-                description='Unauthorized - Invalid or missing access token.'
-            ),
-            403: OpenApiResponse(
-                description='Forbidden - User does not have permission to update this profile.'
-            ),
-        },
     ),
     patch=extend_schema(
+        tags=['User Profile'],
         summary='Partially Update User Profile',
         description='Partially update the profile information of the authenticated user.',
         request=ProfileSerializer,
-        responses={
-            200: ProfileSerializer,
-            400: OpenApiResponse(
-                description='Bad Request - Invalid data provided.'
-            ),
-            401: OpenApiResponse(
-                description='Unauthorized - Invalid or missing access token.'
-            ),
-            403: OpenApiResponse(
-                description='Forbidden - User does not have permission to update this profile.'
-            ),
-        },
     ),
 )
 class ProfileAPIView(RetrieveUpdateAPIView):
@@ -171,17 +100,10 @@ class ProfileAPIView(RetrieveUpdateAPIView):
         return user
 
 
-@extend_schema_view(
-    get=extend_schema(
-        summary='Retrieve User Details',
-        description='Fetch the details of the authenticated user.',
-        responses={
-            200: UserSerializer,
-            401: OpenApiResponse(
-                description='Unauthorized - Invalid or missing access token.'
-            ),
-        },
-    )
+@extend_schema(
+    tags=['User Management'],
+    summary='Retrieve User Details',
+    description='Fetch the details of the authenticated user.',
 )
 class UserAPIView(RetrieveAPIView):
     """

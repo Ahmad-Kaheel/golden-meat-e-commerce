@@ -1,13 +1,9 @@
-from rest_framework.routers import DefaultRouter
-from django.urls import include, path
+from django.urls import path
 
-from address.views import AddressViewSet
+from address.views import UserAddressAPIView
 
-app_name = "addresses"
-
-router = DefaultRouter()
-router.register(r"", AddressViewSet)
+app_name = "addresse"
 
 urlpatterns = [
-    path("address/", include(router.urls)),
+        path('', UserAddressAPIView.as_view(), name='user-address'),
 ]

@@ -111,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 DATABASES = {
     'default': {
-        'ENGINE': "django.db.backends.postgresql",
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'mydatabase', 
         'USER': 'myuser',
         'PASSWORD': 'mypassword',

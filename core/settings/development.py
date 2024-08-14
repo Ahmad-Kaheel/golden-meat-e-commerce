@@ -5,7 +5,6 @@ from .base import *
 # DEBUG = config("DEBUG", default=False, cast=bool)
 DEBUG = True
 
-SECRET_KEY = "fffffffffffdddddddddssssss$#AAAAsdfsdf123224gfffffd"
 
 # ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv())
 ALLOWED_HOSTS = []
@@ -28,14 +27,13 @@ DEFAULT_FROM_EMAIL = 'example@example.com'
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-
 DATABASES = {
     'default': {
-        'ENGINE': "django.db.backends.postgresql",
-        'DB_NAME': 'mydatabase',
-        'DB_USERNAME': 'myuser',
-        'DB_PASSWORD': 'mypassword',
-        'HOST': "localhost",
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'mydatabase', 
+        'USER': 'myuser',
+        'PASSWORD': 'mypassword',
+        'HOST': "db",
         'PORT': "5432",
     }
 }

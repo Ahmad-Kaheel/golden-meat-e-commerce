@@ -13,7 +13,9 @@ sys.path.append(str(PARENT_DIR / 'apps'))
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY")
+# SECRET_KEY = config("SECRET_KEY")
+SECRET_KEY = "fffffffffffdddddddddssssss$#AAAAsdfsdf123224gfffffd"
+
 
 
 # Application definition

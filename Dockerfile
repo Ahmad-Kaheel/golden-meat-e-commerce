@@ -9,7 +9,7 @@ WORKDIR /code
 COPY ./udjrequirements.txt .
 
 RUN apt-get update -y && \
-    apt-get install -y netcat-openbsd libpq-dev && \
+    apt-get install -y netcat-openbsd && \
     pip install --upgrade pip && \
     pip install -r udjrequirements.txt
 

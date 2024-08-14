@@ -120,12 +120,12 @@ AUTH_PASSWORD_VALIDATORS = [
 #     }
 # }
 
-DB_ENGINE = config("DB_ENGINE", default="django.db.backends.sqlite3")
-DB_NAME = config("DB_NAME", default=os.path.join(BASE_DIR, "db.sqlite3"))
-DB_USER = config("DB_USERNAME", default="")
-DB_PASSWORD = config("DB_PASSWORD", default="")
-DB_HOST = config("DB_HOSTNAME", default="")
-DB_PORT = config("DB_PORT", default="")
+# DB_ENGINE = config("DB_ENGINE", default="django.db.backends.sqlite3")
+# DB_NAME = config("DB_NAME", default=os.path.join(BASE_DIR, "db.sqlite3"))
+# DB_USER = config("DB_USERNAME", default="")
+# DB_PASSWORD = config("DB_PASSWORD", default="")
+# DB_HOST = config("DB_HOSTNAME", default="")
+# DB_PORT = config("DB_PORT", default="")
 
 # # إعداد قاعدة البيانات
 # if DB_ENGINE == "django.db.backends.postgresql" and all([DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT]):
@@ -140,12 +140,12 @@ DB_PORT = config("DB_PORT", default="")
 #         }
 #     }
 # else:
-#     DATABASES = {
-#         "default": {
-#             "ENGINE": "django.db.backends.sqlite3",
-#             "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
-#         }
-#     }
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/

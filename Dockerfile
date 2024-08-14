@@ -9,13 +9,14 @@ WORKDIR /code
 COPY ./djrequirements.txt .
 
 RUN apt-get update -y && \
-    apt-get install -y netcat && \
+    apt-get install -y netcat-openbsd && \
     pip install --upgrade pip && \
     pip install -r djrequirements.txt
 
 COPY ./entrypoint.sh /code/entrypoint.sh
-RUN chmod +x /code/entrypoint.sh
+RUN chown -R $USER:$USER /code/entrypoint.sh
+RUN chmod a+x /code/entrypoint.sh
 
 COPY . .
 
-ENTRYPOINT ["/code/entrypoint.sh"]
+CMD ["sh", "/code/entrypoint.sh"]

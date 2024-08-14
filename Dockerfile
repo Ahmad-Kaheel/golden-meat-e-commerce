@@ -9,7 +9,7 @@ WORKDIR /code
 COPY ./udjrequirements.txt .
 
 RUN apt-get update -y && \
-    apt-get install -y netcat-openbsd gcc python3-dev musl-dev tzdata libc6-dev  && \
+    apt-get install -y netcat-openbsd && \
     pip install --upgrade pip && \
     pip install -r udjrequirements.txt
 

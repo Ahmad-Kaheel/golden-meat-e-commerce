@@ -40,3 +40,10 @@ CORS_ORIGIN_ALLOW_ALL = True
 #         }
 #     }
 # }
+
+DB_ENGINE = config("DB_ENGINE", default="django.db.backends.sqlite3")
+DB_NAME = config("DB_NAME", default=os.path.join(BASE_DIR, "db.sqlite3"))
+DB_USER = config("DB_USERNAME", default="")
+DB_PASSWORD = config("DB_PASSWORD", default="")
+DB_HOST = config("DB_HOSTNAME", default="")
+DB_PORT = config("DB_PORT", default="")

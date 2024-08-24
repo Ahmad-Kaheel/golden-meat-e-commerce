@@ -45,9 +45,6 @@ DATABASES = {
         'PASSWORD': '',
         'HOST': "db",
         'PORT': "5432",
-        'OPTIONS': {
-            'service': 'db',
-        }
     }
 }
 

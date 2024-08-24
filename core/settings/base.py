@@ -4,12 +4,16 @@ import sys
 from pathlib import Path
 from datetime import timedelta
 from decouple import Csv, config
+from django.utils.translation import gettext_lazy as _
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 PARENT_DIR = BASE_DIR.parent
 sys.path.append(str(PARENT_DIR / 'apps'))
 # print("BASE_DIR", BASE_DIR)
+
+
 
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -39,13 +43,15 @@ INSTALLED_APPS = [
     "phonenumber_field",
     "corsheaders",
     'drf_spectacular',
+    'modeltranslation',
     # local app
     "customer",
     "address",
     "catalogue",
-    # "order",
+    "order",
     "voucher",
-    # "basket",
+    "basket",
+    "payment",
 
 ]
 
@@ -55,6 +61,8 @@ CORS_ALLOW_CREDENTIALS = True
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -121,7 +129,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # }
 
 # DB_ENGINE = config("DB_ENGINE", default="django.db.backends.sqlite3")
-# DB_NAME = config("DB_NAME", default=os.path.join(BASE_DIR, "db.sqlite3"))
+# DB_NAME = config("DB_NAME", default=os.path.join(PARENT_DIR, "db.sqlite3"))
 # DB_USER = config("DB_USERNAME", default="")
 # DB_PASSWORD = config("DB_PASSWORD", default="")
 # DB_HOST = config("DB_HOSTNAME", default="")
@@ -140,29 +148,35 @@ AUTH_PASSWORD_VALIDATORS = [
 #         }
 #     }
 # else:
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
-    }
-}
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django.db.backends.sqlite3",
+#         "NAME": os.path.join(PARENT_DIR, "db.sqlite3"),
+#     }
+# }
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ar'
 
 LANGUAGES = [
-    ('en-us', 'English'),
-    ('ar', 'Arabic'),
+    ('ar', _('Arabic')),
+    ('en-us', _('English (US)')),
 ]
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Riyadh'
 
 USE_I18N = True
-
 USE_TZ = True
 
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'ar'
+
+MODELTRANSLATION_LANGUAGES = ('ar', 'en')
+
+MODELTRANSLATION_PREPOPULATE_LANGUAGE = 'ar'
+
+LOCALE_PATHS = [os.path.join(PARENT_DIR, 'locale')]
 
 
 # Authentication
@@ -176,7 +190,7 @@ AUTH_USER_MODEL = 'customer.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        # 'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
@@ -228,9 +242,14 @@ SIMPLE_JWT = {
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-MEDIA_URL = '/media/'
+# STATIC_URL = 'static/'
 
-STATIC_URL = '/static/'
+# STATIC_ROOT = os.path.join(PARENT_DIR, 'staticfiles')
+# STATICFILES_DIRS = [os.path.join(PARENT_DIR, "static")]
+
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(PARENT_DIR, 'media')
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -254,41 +273,3 @@ SPECTACULAR_SETTINGS = {
     },
 }
 
-
-
-# login
-"""
-
-{
-	"email": "amin1@amin.com",
-	"password": "123qweasd_"
-}
-
-
-"""
-
-"""
-{
-    "email": "amin1@amin.com",
-    "password1": "123qweasd_",
-    "password2": "123qweasd_",
-    "first_name": "amin1",
-    "last_name": "amin1"
-}
-
-"""
-
-
-# address
-"""
-{
-  "city": "city1",
-  "street_address": "street1",
-  "apartment_address": "apartment1",
-  "postal_code": "postal1",
-  "is_default_for_billing": true,
-  "is_default_for_shipping": true,
-  "phone_number": "0099000990",
-  "notes": "ssssddddfff"
-}
-"""

@@ -1,7 +1,9 @@
+from decimal import Decimal
+
 def get_discount(price, discount):
     """Calculating discount"""
 
-    discount = float(price * discount / 100)
-    total = float(price - discount)
+    discount_amount = (price * Decimal(discount) / Decimal(100))
+    total = price - discount_amount
     int_total = int(total)
     return int_total

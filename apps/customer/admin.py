@@ -1,9 +1,39 @@
 from django.contrib import admin
-from django.contrib.auth import get_user_model
+from django import forms
+from customer.models import User, Profile
 
-from customer.models import Profile
+class UserAdminForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = '__all__'
+        widgets = {
+            'email': forms.EmailInput(attrs={'size': '40'}),
+            'get_full_name': forms.TextInput(attrs={'size': '40'}),
+        }
 
-User = get_user_model()
+class UserAdmin(admin.ModelAdmin):
+    form = UserAdminForm
+    list_display = ('email', 'get_full_name', 'is_staff', 'is_active', 'date_joined')
+    list_filter = ('is_staff', 'is_active', 'date_joined')
+    search_fields = ('email',)
+    ordering = ('-date_joined',)
+    readonly_fields = ('date_joined',)
 
-admin.site.register(User)
-admin.site.register(Profile)
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return self.readonly_fields + ('email',)
+        return self.readonly_fields
+
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'avatar', 'bio', 'created_at', 'updated_at')
+    list_filter = ('created_at',)
+    search_fields = ('user__email', 'bio')
+    readonly_fields = ('created_at', 'updated_at')
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return self.readonly_fields
+        return self.readonly_fields
+
+admin.site.register(User, UserAdmin)
+admin.site.register(Profile, ProfileAdmin)

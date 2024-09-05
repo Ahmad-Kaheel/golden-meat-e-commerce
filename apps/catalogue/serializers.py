@@ -1,77 +1,118 @@
 from rest_framework import serializers
 
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import get_language
 
 from catalogue.models import (
     Product,
     Category,
     Review,
+    ProductSpecification
 )
 
 
-
 class ProductCategoryReadSerializer(serializers.ModelSerializer):
-    """
-    Serializer class for product categories
-    """
-
     class Meta:
         model = Category
-        fields = "__all__"
+        fields = [
+            'id', 'name', 'description', 'created_at'
+        ]
+
+    def clean_text_field(self, value):
+        return value.strip() if value else None
+
+    def validate(self, data):
+        data['name'] = self.clean_text_field(data.get('name'))
+        data['description'] = self.clean_text_field(data.get('description'))
+        return data
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['name'] = instance.name
+        representation['description'] = instance.description
+        return representation
 
 
 class ProductReadSerializer(serializers.ModelSerializer):
-    category_name = serializers.CharField(source="category.name", read_only=True)
+    category_names = serializers.SerializerMethodField()
     specifications = serializers.SerializerMethodField()
     countries = serializers.SerializerMethodField()
     images = serializers.SerializerMethodField()
     recommended_products = serializers.SerializerMethodField()
     reviews = serializers.SerializerMethodField()
+    price_with_discount = serializers.ReadOnlyField()
 
     class Meta:
         model = Product
         fields = (
             'id',
             'title',
-            'category_name',
+            'category_names',
             'specifications',
             'countries',
             'images',
             'recommended_products',
             'reviews',
             'price',
+            'price_with_discount',
+            'quantity',
+            'discount',
+            'is_public',
+            'main_image_url',
+            'rating',
             'description',
         )
 
+    def get_category_names(self, obj):
+        return [category.name for category in obj.categories.all()]
+
     def get_specifications(self, obj):
-        return [
-            {
-                "name": spec.name,
-                "value": spec.value,
-            }
-            for spec in obj.specifications.all()
-        ]
+        language = get_language()
+        specifications = []
+        
+        for spec in obj.specifications.all():
+            if spec.predefined_name != 'other':
+                if language == 'ar':
+                    name = dict(ProductSpecification.PREDEFINED_NAME_CHOICES_AR).get(spec.predefined_name)
+                    unit = dict(ProductSpecification.WEIGHT_UNIT_CHOICES_AR).get(spec.predefined_unit)
+                elif language == 'en':
+                    name = dict(ProductSpecification.PREDEFINED_NAME_CHOICES).get(spec.predefined_name)
+                    unit = dict(ProductSpecification.WEIGHT_UNIT_CHOICES).get(spec.predefined_unit)
+                else:
+                    name = spec.predefined_name
+                    unit = spec.predefined_unit
+            else:
+                name = spec.custom_name
+                unit = spec.custom_unit
+            
+            specifications.append({
+                "name": name,
+                "unit": unit,
+                "value": spec.custom_value,
+            })
+        
+        return specifications
 
     def get_countries(self, obj):
-        return [
-            country.country.name
-            for country in obj.countries.all()
-        ]
+        return [country.name for country in obj.source_country.all()]
 
     def get_images(self, obj):
-        return [
-            {
-                "url": image.image_url.url,
-                "alt_text": image.alt_text,
-            }
-            for image in obj.images.all()
-        ]
+        if obj.main_image_url and hasattr(obj.main_image_url, 'url'):
+            return [
+                {
+                    "url": obj.main_image_url.url,
+                    "alt_text": "sub images for product {}".format(obj.title),
+                }
+            ]
+        else:
+            return []
 
     def get_recommended_products(self, obj):
         return [
             {
                 "id": recommendation.recommendation.id,
                 "title": recommendation.recommendation.title,
+                "ranking": recommendation.ranking
             }
             for recommendation in obj.primary_recommendations.all()
         ]
@@ -107,12 +148,14 @@ class ProductReadSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     user_email = serializers.SerializerMethodField()
     product_title = serializers.SerializerMethodField()
+    replies = serializers.SerializerMethodField()
 
     class Meta:
         model = Review
         fields = [
             'id', 'user_email', 'product_title', 'product', 'rating', 
-            'review', 'parent', 'verified', 'created_at', 'updated_at'
+            'review', 'parent', 'replies', 'verified', 
+            'created_at', 'updated_at'
         ]
         read_only_fields = ['user_email', 'verified', 'product_title', 'created_at', 'updated_at']
 
@@ -122,23 +165,29 @@ class ReviewSerializer(serializers.ModelSerializer):
     def get_product_title(self, obj):
         return obj.product.title
 
-    def to_internal_value(self, data):
-        if 'parent' in data and data['parent'] in [0, '0', '', None]:
-            data['parent'] = None
-        
-        if data.get('parent') is not None:
-            data.pop('rating', None)
-        return super().to_internal_value(data)
+    def get_replies(self, obj):
+        replies = obj.reply.all()
+        return ReviewSerializer(replies, many=True).data
+
+    def clean_text_field(self, value):
+        return value.strip() if value else None
 
     def validate(self, attrs):
+        request = self.context.get('request')
         parent = attrs.get('parent')
         product = attrs.get('product')
-        if parent and product and parent.product != product:
-            raise serializers.ValidationError(_("The review must refer to the same product of the parent review."))
+
+        if request.method == 'POST':
+            if parent and product and parent.product != product:
+                raise serializers.ValidationError(_("The review must refer to the same product of the parent review."))
+
+            if not parent and Review.objects.filter(user=request.user, product=product).exists():
+                raise serializers.ValidationError(_("You can only create one review per product."))
+
+        attrs['review'] = self.clean_text_field(attrs.get('review'))
+
         return attrs
 
-    def update(self, instance, validated_data):
-        instance.rating = validated_data.get('rating', instance.rating)
-        instance.review = validated_data.get('review', instance.review)
-        instance.save()
-        return instance
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        return representation

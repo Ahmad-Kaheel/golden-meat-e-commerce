@@ -11,13 +11,8 @@ from django.utils.translation import gettext_lazy as _
 BASE_DIR = Path(__file__).resolve().parent.parent
 PARENT_DIR = BASE_DIR.parent
 sys.path.append(str(PARENT_DIR / 'apps'))
-# print("BASE_DIR", BASE_DIR)
 
 
-
-
-# SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = config("SECRET_KEY")
 SECRET_KEY = "fffffffffffdddddddddssssss$#AAAAsdfsdf123224gfffffd"
 
 
@@ -48,10 +43,10 @@ INSTALLED_APPS = [
     "customer",
     "address",
     "catalogue",
-    # "order",
-    # "voucher",
-    # "basket",
-    # "payment",
+    "order",
+    "voucher",
+    "basket",
+    "payment",
 
 ]
 
@@ -117,37 +112,17 @@ AUTH_PASSWORD_VALIDATORS = [
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'mydatabase', 
-        'USER': 'myuser',
-        'PASSWORD': 'mypassword',
-        'HOST': "db",
-        'PORT': "5432",
-    }
-}
-
-# DB_ENGINE = config("DB_ENGINE", default="django.db.backends.sqlite3")
-# DB_NAME = config("DB_NAME", default=os.path.join(PARENT_DIR, "db.sqlite3"))
-# DB_USER = config("DB_USERNAME", default="")
-# DB_PASSWORD = config("DB_PASSWORD", default="")
-# DB_HOST = config("DB_HOSTNAME", default="")
-# DB_PORT = config("DB_PORT", default="")
-
-# # إعداد قاعدة البيانات
-# if DB_ENGINE == "django.db.backends.postgresql" and all([DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT]):
-#     DATABASES = {
-#         "default": {
-#             "ENGINE": DB_ENGINE,
-#             "NAME": DB_NAME,
-#             "USER": DB_USER,
-#             "PASSWORD": DB_PASSWORD,
-#             "HOST": DB_HOST,
-#             "PORT": DB_PORT,
-#         }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'mydatabase', 
+#         'USER': 'myuser',
+#         'PASSWORD': 'mypassword',
+#         'HOST': "db",
+#         'PORT': "5432",
 #     }
-# else:
+# }
+
 # DATABASES = {
 #     "default": {
 #         "ENGINE": "django.db.backends.sqlite3",
@@ -190,7 +165,7 @@ AUTH_USER_MODEL = 'customer.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
@@ -212,8 +187,8 @@ USER_MODEL_USERNAME_FIELD = 'email'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=10),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=40),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=40),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=60),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
@@ -242,13 +217,13 @@ SIMPLE_JWT = {
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+# STATIC_URL = 'static/'
 
-STATIC_ROOT = os.path.join(PARENT_DIR, 'staticfiles')
+# STATIC_ROOT = os.path.join(PARENT_DIR, 'staticfiles')
 # STATICFILES_DIRS = [os.path.join(PARENT_DIR, "static")]
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(PARENT_DIR, 'media')
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(PARENT_DIR, 'media')
 
 
 # Default primary key field type

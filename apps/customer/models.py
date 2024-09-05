@@ -1,5 +1,3 @@
-from phonenumber_field.modelfields import PhoneNumberField
-
 from django.contrib.auth import models as auth_models
 from django.db import models
 from django.core.mail import send_mail
@@ -48,8 +46,6 @@ class User(auth_models.AbstractBaseUser, auth_models.PermissionsMixin):
     """
 
     email = models.EmailField(_("email address"), unique=True)
-    first_name = models.CharField(_("First name"), max_length=255, blank=True)
-    last_name = models.CharField(_("Last name"), max_length=255, blank=True)
     is_staff = models.BooleanField(
         _("Staff status"),
         default=False,
@@ -79,18 +75,20 @@ class User(auth_models.AbstractBaseUser, auth_models.PermissionsMixin):
         super().clean()
         self.email = self.__class__.objects.normalize_email(self.email)
 
+    @property
     def get_full_name(self):
         """
         Return the first_name plus the last_name, with a space in between.
         """
-        full_name = "%s %s" % (self.first_name, self.last_name)
+        full_name = "%s %s" % (self.profile.first_name, self.profile.last_name)
         return full_name.strip()
-
+    
+    @property
     def get_short_name(self):
         """
         Return the short name for the user.
         """
-        return self.first_name
+        return self.profile.first_name
 
     def email_user(self, subject, message, from_email=None, **kwargs):
         """
@@ -101,8 +99,10 @@ class User(auth_models.AbstractBaseUser, auth_models.PermissionsMixin):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, related_name="profile", on_delete=models.CASCADE)
-    avatar = models.ImageField(upload_to="avatar", blank=True)
-    bio = models.CharField(max_length=200, blank=True)
+    first_name = models.CharField(_("First name"), max_length=255, blank=True, null=True)
+    last_name = models.CharField(_("Last name"), max_length=255, blank=True, null=True)
+    avatar = models.ImageField(upload_to="avatar", blank=True, null=True)
+    bio = models.CharField(max_length=200, blank=True, null=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -113,6 +113,6 @@ class Profile(models.Model):
         verbose_name_plural = _("Profile")
 
     def __str__(self):
-        return self.user.get_full_name()
+        return str(self.user.get_full_name)
 
 

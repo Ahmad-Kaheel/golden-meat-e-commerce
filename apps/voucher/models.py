@@ -4,6 +4,7 @@ import os
 from django.utils import timezone
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
 
 from catalogue.models import Product
 from voucher.services import generate_end_date
@@ -33,12 +34,25 @@ class Coupon(models.Model):
         default=1,
         verbose_name=_("Chance to drop")
     )
+    quantity_threshold = models.PositiveIntegerField(
+        default=100,
+        verbose_name=_("Quantity Threshold")
+    )
 
     class Meta:
         verbose_name = _("coupon")
         verbose_name_plural = _("Coupons")
         ordering = ['discount']
 
+    def clean(self):
+        if self.discount > 100:
+            raise ValidationError(_('Discount cannot exceed 100%.'))
+
+        if self.drop_chance < 0 or self.drop_chance > 100:
+            raise ValidationError(_('Drop chance must be between 0 and 100.'))
+        
+        super().clean()
+    
     def __str__(self):
         return _('Coupon for: %(product_title)s') % {'product_title': self.product.title}
     
@@ -72,11 +86,12 @@ class UserCoupon(models.Model):
     class Meta:
         verbose_name = _('user coupon')
         verbose_name_plural = _("Users' coupons")
+        unique_together = ('coupon', 'user')
 
     def __str__(self):
         return _('Coupon for product: %(product_name)s. Discount: %(discount)s%%') % {
-            'product_name': self.product.title,
-            'discount': self.discount
+            'product_name': self.coupon.product.title,
+            'discount': self.coupon.discount
         }
 
     def save(self, *args, **kwargs):

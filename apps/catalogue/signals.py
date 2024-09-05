@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import Product
+from catalogue.models import Product
 
 @receiver(post_save, sender=Product)
 def update_is_public_if_quantity_zero(sender, instance, **kwargs):

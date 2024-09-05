@@ -1,0 +1,14 @@
+.inline-related {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.inline-related .form-row {
+    flex: 1 1 45%;
+    min-width: 300px;
+    margin-right: 20px;
+}
+
+.inline-related .form-row:nth-child(odd) {
+    clear: both;
+}

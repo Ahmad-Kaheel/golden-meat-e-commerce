@@ -3,17 +3,14 @@ from .base import *
 from django.utils.translation import gettext_lazy as _
 
 
-# SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = config("DEBUG", default=False, cast=bool)
 DEBUG = True
 
 
-# ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv())
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'] += (
-    # 'rest_framework.authentication.SessionAuthentication',
+    'rest_framework.authentication.SessionAuthentication',
 )
 
 
@@ -27,37 +24,33 @@ MEDIA_ROOT = os.path.join(PARENT_DIR, 'media')
 
 
 
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'example@example.com'
-# Email service : mailtrap
-EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
-EMAIL_PORT = '2525'
-EMAIL_HOST_USER = '4f4653374f7ae8'
-EMAIL_HOST_PASSWORD = '0b0406b76e4d50'
+
+
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'mydatabase', 
-        'USER': 'myuser',
-        'PASSWORD': 'mypassword',
-        'HOST': "db",
-        'PORT': "5432",
-    }
-}
-
 # DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": os.path.join(PARENT_DIR, "db.sqlite3"),
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'mydatabase', 
+#         'USER': 'myuser',
+#         'PASSWORD': '',
+#         'HOST': "db",
+#         'PORT': "5432",
+#         'OPTIONS': {
+#             'service': 'db',
+#         }
 #     }
 # }
 
-
-
-
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(PARENT_DIR, "db.sqlite3"),
+    }
+}
 
 
 

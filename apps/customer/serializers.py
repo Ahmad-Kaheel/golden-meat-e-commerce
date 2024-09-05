@@ -1,15 +1,15 @@
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from rest_framework import serializers
+
 from django.contrib.auth import authenticate, get_user_model
 from django.utils.translation import gettext_lazy as _
 
-from address.serializers import AddressSerializer
+from address.serializers import ShippingAddressSerializer, BillingAddressSerializer
 from customer.exceptions import (
     AccountDisabledException,
     InvalidCredentialsException,
 )
 from customer.models import Profile
-from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
@@ -20,8 +20,6 @@ class UserRegistrationSerializer(RegisterSerializer):
     """
     email = serializers.EmailField(required=True)
     username = None
-    first_name = serializers.CharField(required=True, write_only=True)
-    last_name = serializers.CharField(required=True, write_only=True)
 
     def validate(self, validated_data):
         email = validated_data.get("email")
@@ -37,8 +35,6 @@ class UserRegistrationSerializer(RegisterSerializer):
     
     def save(self, request):
         user = super().save(request)
-        user.first_name = self.validated_data.get('first_name', '')
-        user.last_name = self.validated_data.get('last_name', '')
         user.save()
 
         return user
@@ -90,18 +86,37 @@ class UserLoginSerializer(serializers.Serializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    """
-    Serializer class to serialize the user Profile model
-    """
+    shipping_address = ShippingAddressSerializer(many=True, read_only=True, source='user.shipping_addresses')
+    billing_address = BillingAddressSerializer(many=True, read_only=True, source='user.billing_addresses')
+    avatar = serializers.ImageField(required=False, allow_null=True)
 
     class Meta:
         model = Profile
         fields = (
-            "avatar",
-            "bio",
-            "created_at",
-            "updated_at",
+            "first_name", "last_name", "avatar",
+            "shipping_address", "billing_address",
+            "bio", "created_at", "updated_at",
         )
+
+    def clean_text_field(self, value):
+        return value.strip() if value else None
+
+    def validate(self, data):
+        # Clean and validate fields without considering the language
+        data['first_name'] = self.clean_text_field(data.get('first_name'))
+        data['last_name'] = self.clean_text_field(data.get('last_name'))
+        data['bio'] = self.clean_text_field(data.get('bio'))
+        
+        return data
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        # Set the default representation without language-specific logic
+        representation['first_name'] = instance.first_name
+        representation['last_name'] = instance.last_name
+        representation['bio'] = instance.bio
+
+        return representation
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -110,16 +125,16 @@ class UserSerializer(serializers.ModelSerializer):
     """
 
     profile = ProfileSerializer(read_only=True)
-    addresses = AddressSerializer(read_only=True, many=True)
+    shipping_address = ShippingAddressSerializer(read_only=True, many=True)
+    billing_address = BillingAddressSerializer(read_only=True, many=True)
 
     class Meta:
         model = User
         fields = (
             "id",
             "email",
-            "first_name",
-            "last_name",
             "is_active",
             "profile",
-            "addresses",
+            "shipping_address",
+            "billing_address",
         )

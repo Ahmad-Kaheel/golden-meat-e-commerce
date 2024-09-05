@@ -14,9 +14,7 @@ from drf_spectacular.views import (
     SpectacularRedocView
 )
 
-# from drf_yasg.views import get_schema_view
-# from drf_yasg import openapi
-
+from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -69,3 +67,10 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+
+
+admin.site.site_header = _("Golden Meat Shop")
+admin.site.site_title = _("Golden Meat Shop")
+admin.site.index_title = _("Welcome to Golden Meat Shop")

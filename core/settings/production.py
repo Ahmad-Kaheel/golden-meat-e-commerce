@@ -1,10 +1,9 @@
 from .base import *
 
-# DEBUG = False
-DEBUG = config("DEBUG", default=False, cast=bool)
+DEBUG = False
 
-# ALLOWED_HOSTS = ['your-production-domain.com']
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv())
+ALLOWED_HOSTS = ['your-production-domain.com']
+
 
 # DATABASES = {
 #     'default': {

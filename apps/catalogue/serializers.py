@@ -97,15 +97,26 @@ class ProductReadSerializer(serializers.ModelSerializer):
         return [country.name for country in obj.source_country.all()]
 
     def get_images(self, obj):
+        images = []
+        
+        # إضافة الصورة الرئيسية إن وجدت
         if obj.main_image_url and hasattr(obj.main_image_url, 'url'):
-            return [
-                {
-                    "url": obj.main_image_url.url,
-                    "alt_text": "sub images for product {}".format(obj.title),
-                }
-            ]
-        else:
-            return []
+            images.append({
+                "url": obj.main_image_url.url,
+                "alt_text": "Main image for product {}".format(obj.title),
+            })
+        
+        # التحقق من وجود صور فرعية قبل إضافتها
+        if obj.images.exists():
+            for image in obj.images.all():
+                if image.image_url and hasattr(image.image_url, 'url'):
+                    images.append({
+                        "url": image.image_url.url,
+                        "alt_text": image.alt_text or "Image for product {}".format(obj.title),
+                    })
+        
+        return images
+
 
     def get_recommended_products(self, obj):
         return [

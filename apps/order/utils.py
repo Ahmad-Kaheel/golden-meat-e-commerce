@@ -1,3 +1,8 @@
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from django.http import HttpResponse
+from django.utils.translation import gettext as _
+
 from basket.utils import BasketMixin, BasketOperationTypes
 # from apps.payment.services import paypal_create_order
 from order.models import OrderItems, Order
@@ -306,3 +311,134 @@ class OrderMixin(BasketMixin):
         billing_info.is_default_for_billing = True
         billing_info.save()
         return billing_info
+
+
+
+
+
+# from reportlab.lib.pagesizes import A4
+# from reportlab.pdfgen import canvas
+# from reportlab.pdfbase.ttfonts import TTFont
+# from reportlab.pdfbase import pdfmetrics
+# import arabic_reshaper
+# from bidi.algorithm import get_display
+# from io import BytesIO
+# from django.http import HttpResponse
+
+# arabic_font_path = 'static/fonts/Amiri-1.000/Amiri-Regular.ttf'
+
+# def generate_invoice_pdf(order):
+
+    # pdfmetrics.registerFont(TTFont('Amiri', arabic_font_path))
+    
+    # buffer = BytesIO()
+    # pdf = canvas.Canvas(buffer, pagesize=A4)
+    # width, height = A4
+
+    # pdf.setFont("Amiri", 16)
+
+    # arabic_title = "فاتورة"
+    # reshaped_title = arabic_reshaper.reshape(arabic_title)
+    # bidi_title = get_display(reshaped_title)
+    # pdf.drawRightString(width - 50, height - 50, bidi_title)
+
+    # y_position = height - 100
+
+    # pdf.setFont("Amiri", 12)
+    # order_id_text = f"رقم الطلب: {order.order_id}"
+    # reshaped_order_id = arabic_reshaper.reshape(order_id_text)
+    # bidi_order_id = get_display(reshaped_order_id)
+    # pdf.drawRightString(width - 50, y_position, bidi_order_id)
+    # y_position -= 20
+
+    # user_text = f"المستخدم: {order.user.email if order.user else 'ضيف'}"
+    # reshaped_user = arabic_reshaper.reshape(user_text)
+    # bidi_user = get_display(reshaped_user)
+    # pdf.drawRightString(width - 50, y_position, bidi_user)
+    # y_position -= 20
+
+    # status_text = f"حالة الطلب: {dict(Order.ORDER_STATUSES).get(order.order_status, 'غير معروفة')}"
+    # reshaped_status = arabic_reshaper.reshape(status_text)
+    # bidi_status = get_display(reshaped_status)
+    # pdf.drawRightString(width - 50, y_position, bidi_status)
+    # y_position -= 20
+
+    # total_amount_text = f"إجمالي المبلغ: {order.total_amount} عملة"
+    # reshaped_total_amount = arabic_reshaper.reshape(total_amount_text)
+    # bidi_total_amount = get_display(reshaped_total_amount)
+    # pdf.drawRightString(width - 50, y_position, bidi_total_amount)
+    # y_position -= 40
+
+    # shipping_title = "معلومات الشحن:"
+    # reshaped_shipping_title = arabic_reshaper.reshape(shipping_title)
+    # bidi_shipping_title = get_display(reshaped_shipping_title)
+    # pdf.drawRightString(width - 50, y_position, bidi_shipping_title)
+    # y_position -= 20
+
+    # if order.shipping_info:
+    #     city_text = f"المدينة: {order.shipping_info.city}"
+    #     reshaped_city = arabic_reshaper.reshape(city_text)
+    #     bidi_city = get_display(reshaped_city)
+    #     pdf.drawRightString(width - 50, y_position, bidi_city)
+    #     y_position -= 20
+
+    #     address_text = f"العنوان: {order.shipping_info.street_address}"
+    #     reshaped_address = arabic_reshaper.reshape(address_text)
+    #     bidi_address = get_display(reshaped_address)
+    #     pdf.drawRightString(width - 50, y_position, bidi_address)
+    #     y_position -= 20
+
+    #     postal_code_text = f"الرمز البريدي: {order.shipping_info.postal_code}"
+    #     reshaped_postal_code = arabic_reshaper.reshape(postal_code_text)
+    #     bidi_postal_code = get_display(reshaped_postal_code)
+    #     pdf.drawRightString(width - 50, y_position, bidi_postal_code)
+    #     y_position -= 40
+
+    # billing_title = "معلومات الفاتورة:"
+    # reshaped_billing_title = arabic_reshaper.reshape(billing_title)
+    # bidi_billing_title = get_display(reshaped_billing_title)
+    # pdf.drawRightString(width - 50, y_position, bidi_billing_title)
+    # y_position -= 20
+
+    # if order.billing_info:
+    #     billing_city_text = f"المدينة: {order.billing_info.city}"
+    #     reshaped_billing_city = arabic_reshaper.reshape(billing_city_text)
+    #     bidi_billing_city = get_display(reshaped_billing_city)
+    #     pdf.drawRightString(width - 50, y_position, bidi_billing_city)
+    #     y_position -= 20
+
+    #     billing_address_text = f"العنوان: {order.billing_info.street_address}"
+    #     reshaped_billing_address = arabic_reshaper.reshape(billing_address_text)
+    #     bidi_billing_address = get_display(reshaped_billing_address)
+    #     pdf.drawRightString(width - 50, y_position, bidi_billing_address)
+    #     y_position -= 20
+
+    #     billing_postal_code_text = f"الرمز البريدي: {order.billing_info.postal_code}"
+    #     reshaped_billing_postal_code = arabic_reshaper.reshape(billing_postal_code_text)
+    #     bidi_billing_postal_code = get_display(reshaped_billing_postal_code)
+    #     pdf.drawRightString(width - 50, y_position, bidi_billing_postal_code)
+    #     y_position -= 40
+
+    # items_title = "عناصر الطلب:"
+    # reshaped_items_title = arabic_reshaper.reshape(items_title)
+    # bidi_items_title = get_display(reshaped_items_title)
+    # pdf.drawRightString(width - 50, y_position, bidi_items_title)
+    # y_position -= 20
+
+    # for item in order.items.all():
+    #     item_text = f"- {item.product.title} x {item.quantity} = {item.total_price}"
+    #     reshaped_item = arabic_reshaper.reshape(item_text)
+    #     bidi_item = get_display(reshaped_item)
+    #     pdf.drawRightString(width - 50, y_position, bidi_item)
+    #     y_position -= 20
+
+    #     if y_position < 50:
+    #         pdf.showPage()
+    #         y_position = height - 100
+
+    # pdf.save()
+    # buffer.seek(0)
+
+    # response = HttpResponse(buffer, content_type='application/pdf')
+    # response['Content-Disposition'] = f'inline; filename="فاتورة_{order.order_id}.pdf"'
+    # return response

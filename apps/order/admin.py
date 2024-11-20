@@ -1,5 +1,11 @@
 from django.contrib import admin
-from order.models import Order, OrderItems
+from order.models import Order, OrderItems, DeliverySettings
+
+
+@admin.register(DeliverySettings)
+class DeliverySettingsAdmin(admin.ModelAdmin):
+    list_display = ('fixed_cost', 'free_delivery_threshold')
+    search_fields = ('fixed_cost',)
 
 class OrderItemsInline(admin.TabularInline):
     model = OrderItems
@@ -16,6 +22,7 @@ class OrderAdmin(admin.ModelAdmin):
         'billing_info',
         'payment_method',
         'delivery_method',
+        'file',
     )
     list_filter = (
         'order_status',

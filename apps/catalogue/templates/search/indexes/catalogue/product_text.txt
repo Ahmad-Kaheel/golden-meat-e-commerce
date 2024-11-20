@@ -1,0 +1,7 @@
+{{ object.title }}
+{{ object.title_ar }}
+{{ object.title_en }}
+{{ object.description }}
+{{ object.description_ar }}
+{{ object.description_en }}
+{{ object.is_wholesale }}

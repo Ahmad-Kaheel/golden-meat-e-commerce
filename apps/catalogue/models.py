@@ -44,6 +44,12 @@ class Category(MPTTModel):
         help_text=_("only puplic category can seen."),
     )
 
+    is_wholesale = models.BooleanField(
+        _("Is wholesale"),
+        default=False,
+        help_text=_("Indicates if this category is available for wholesale.")
+    )
+
     created_at = models.DateTimeField(_("Created At"), auto_now_add=True)
     updated_at = models.DateTimeField(_("Updated At"), auto_now=True)
 
@@ -76,11 +82,19 @@ class Product(models.Model):
         default=1, 
         validators=[MinValueValidator(1)],
     )
+
+    weight = models.DecimalField(
+        decimal_places=2,
+        max_digits=10,
+        default=1,
+        validators=[MinValueValidator(1.00)],
+        help_text=_("Total weight of the product in kilograms.")
+    )
     
     discount = models.IntegerField(
         default=0,
         verbose_name=_("Discount (Optional)"),
-        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        validators=[MinValueValidator(0), MaxValueValidator(60)],
     )
     
     is_public = models.BooleanField(
@@ -88,6 +102,11 @@ class Product(models.Model):
         default=True,
         db_index=True,
         help_text=_("Show this product in search results and catalogue listings."),
+    )
+    is_wholesale = models.BooleanField(
+        _("Is wholesale"),
+        default=False,
+        help_text=_("Indicates if this product is available for wholesale.")
     )
     categories = models.ManyToManyField(
         Category, verbose_name=_("Categories"), 
@@ -134,6 +153,9 @@ class Product(models.Model):
 
         if self.quantity < 1:
             raise ValidationError(_("Quantity must be at least 1."))
+        
+        if self.weight <= 1:
+            raise ValidationError(_("Weight must be greater than 0."))
 
     @property
     def get_translatable_str(self):

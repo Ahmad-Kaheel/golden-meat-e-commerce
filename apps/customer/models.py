@@ -59,6 +59,18 @@ class User(auth_models.AbstractBaseUser, auth_models.PermissionsMixin):
             "active. Unselect this instead of deleting accounts."
         ),
     )
+
+    is_vendor = models.BooleanField(
+        _("Vendor status"),
+        default=False,
+        help_text=_("Designates whether this user is a vendor.")
+    )
+    is_blacklisted = models.BooleanField(
+        _("Blacklisted"),
+        default=False,
+        help_text=_("Designates whether this user is blacklisted.")
+    )
+
     date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
 
     objects = UserManager()
@@ -101,9 +113,21 @@ class Profile(models.Model):
     user = models.OneToOneField(User, related_name="profile", on_delete=models.CASCADE)
     first_name = models.CharField(_("First name"), max_length=255, blank=True, null=True)
     last_name = models.CharField(_("Last name"), max_length=255, blank=True, null=True)
-    avatar = models.ImageField(upload_to="avatar", blank=True, null=True)
-    bio = models.CharField(max_length=200, blank=True, null=True)
+    gender = models.CharField(_("Gender"), max_length=10, choices=[('male', 'Male'), ('female', 'Female'), ('other', 'Other')], blank=True, null=True)
+    date_of_birth = models.DateField(_("Date of Birth"), blank=True, null=True)
+    phone_number = models.CharField(_("Phone Number"), max_length=15, blank=True, null=True)
 
+    # Fields specific to vendors
+    company_name = models.CharField(_("Company Name"), max_length=255, blank=True, null=True)
+    company_type = models.CharField(_("Company Type"), max_length=255, blank=True, null=True)
+    commercial_registration_number = models.CharField(_("Commercial Registration Number"), max_length=255, blank=True, null=True)
+    tax_number = models.CharField(_("Tax Number"), max_length=255, blank=True, null=True)
+    manager_name = models.CharField(_("Manager Name"), max_length=255, blank=True, null=True)
+    company_email = models.EmailField(_("Company Email"), blank=True, null=True)
+    mobile_number = models.CharField(_("Mobile Number"), max_length=15, blank=True, null=True)
+    website = models.URLField(_("Website"), blank=True, null=True)
+    business_activity = models.CharField(_("Business Activity"), max_length=255, blank=True, null=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

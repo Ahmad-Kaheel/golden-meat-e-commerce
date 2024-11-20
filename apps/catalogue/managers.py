@@ -1,24 +1,46 @@
+from django.db.models import Avg
 from django.db import models
 from django.utils.translation import get_language
 from modeltranslation.utils import get_translation_fields
 
+
 class CategoryQuerySet(models.QuerySet):
-    def browsable(self):
+    def browsable(self, user=None, is_wholesale=None):
         """
-        Excludes non-public categories
+        Excludes non-public categories.
+        - If user is provided, include categories based on user type.
         """
-        return self.filter(is_public=True)
+        queryset = self.filter(is_public=True)
+
+        if is_wholesale is not None:
+            queryset = queryset.filter(is_wholesale=is_wholesale)
+
+        elif user and user.is_authenticated and user.is_vendor:
+            queryset = queryset.filter(is_wholesale=True)
+
+        return queryset
+
 
 
 class ProductQuerySet(models.QuerySet):
-    def browsable(self):
+    def browsable(self, user=None, is_wholesale=None):
         """
-        Excludes non-public products and products with non-public categories
+        Excludes non-public products and products with non-public categories.
+        - If user is provided, include products based on user type.
         """
-        return self.filter(
+        queryset = self.filter(
             is_public=True,
             categories__is_public=True
         ).distinct()
+
+        if user and user.is_authenticated:
+            if user.is_vendor:
+                queryset = queryset.filter(is_wholesale=True)
+        else:
+            if is_wholesale is not None:
+                queryset = queryset.filter(is_wholesale=is_wholesale)
+
+        return queryset
 
 
     def by_country(self, country_id):
@@ -41,8 +63,37 @@ class ProductQuerySet(models.QuerySet):
 
     def out_of_stock(self):
         return self.filter(quantity=0)
+    
+    def discounted(self):
+        return self.filter(discount__gt=0)
 
-    def filter_products(self, country_id=None, min_price=None, max_price=None, category_id=None, recommended_for=None):
+    # sort
+    def order_by_price_ascending(self):
+        return self.order_by('price')
+
+    def order_by_price_descending(self):
+        return self.order_by('-price')
+
+    def order_by_date_added(self):
+        return self.order_by('-date_created')
+
+    def order_by_rating(self):
+        return self.order_by('-rating')
+
+    def order_by_rating(self):
+        return self.annotate(avg_rating=Avg('review__rating')).order_by('-avg_rating')
+    
+    def order_by_discount_desc(self):
+        return self.order_by('-discount')
+
+    def order_by_discount_asc(self):
+        return self.order_by('discount')
+
+    
+    def filter_products(self, country_id=None, min_price=None,
+                         max_price=None, category_id=None,
+                         recommended_for=None, order_by=None,
+                         only_discounted=False):
         queryset = self.all()
         if country_id is not None:
             queryset = queryset.by_country(country_id)
@@ -56,6 +107,21 @@ class ProductQuerySet(models.QuerySet):
             queryset = queryset.by_category(category_id)
         if recommended_for is not None:
             queryset = queryset.recommended_for(recommended_for)
+        if only_discounted:
+            queryset = queryset.discounted()
+        
+        if order_by == 'price_asc':
+            queryset = queryset.order_by_price_ascending()
+        elif order_by == 'price_desc':
+            queryset = queryset.order_by_price_descending()
+        elif order_by == 'date_added':
+            queryset = queryset.order_by_date_added()
+        elif order_by == 'rating':
+            queryset = queryset.order_by_rating()
+        elif order_by == 'discount_desc':
+            queryset = queryset.order_by_discount_desc()
+        elif order_by == 'discount_asc':
+            queryset = queryset.order_by_discount_asc()
         return queryset
 
     def translate_field(self, field_name):

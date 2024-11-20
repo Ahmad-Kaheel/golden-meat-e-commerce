@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "corsheaders",
     'drf_spectacular',
     'modeltranslation',
+    'haystack',
     # local app
     "customer",
     "address",
@@ -67,6 +68,17 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'core.urls'
+
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+        'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
+    },
+}
+
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+
 
 TEMPLATES = [
     {

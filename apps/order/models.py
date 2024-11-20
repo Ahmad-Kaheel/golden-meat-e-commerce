@@ -80,6 +80,15 @@ class Order(models.Model):
                                verbose_name=_('Comment'),
                                blank=True,
                                null=True)
+    file = models.FileField(
+        upload_to="order_files/",
+        blank=True,
+        null=True,
+        verbose_name=_("Attached File")
+    )
+
+    delivery_cost = models.IntegerField(default=0, verbose_name='Delivery Cost')
+    free_delivery = models.BooleanField(default=False, verbose_name='Free Delivery')
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Created At"))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_("Updated At"))
@@ -106,6 +115,52 @@ class Order(models.Model):
             raise ValidationError(_('The coupon is not active.'))
 
         super().clean()
+    
+    def calculate_delivery_cost(self):
+        """Calculate delivery cost based on delivery settings."""
+        try:
+            delivery_settings = DeliverySettings.objects.first()
+            print("delivery_settings delivery_settings", delivery_settings)
+            if not delivery_settings:
+                raise ValueError("Delivery settings are not available. Please add delivery settings.")
+
+            if self.total_amount >= delivery_settings.free_delivery_threshold:
+                self.free_delivery = True
+                self.delivery_cost = 0
+            else:
+                self.free_delivery = False
+                self.delivery_cost = delivery_settings.fixed_cost
+
+            # Update the total amount after including delivery cost
+            self.total_amount += self.delivery_cost
+
+        except Exception as e:
+            raise ValueError(f"Error calculating delivery cost: {str(e)}")
+
+    def calculate_delivery_cost(self):
+        """Calculate delivery cost based on delivery settings."""
+        try:
+            delivery_settings = DeliverySettings.objects.first()  # Get delivery settings
+            if not delivery_settings:
+                raise ValueError("Delivery settings are not available. Please add delivery settings.")
+
+            if self.total_amount >= delivery_settings.free_delivery_threshold:
+                self.free_delivery = True
+                self.delivery_cost = 0
+            else:
+                self.free_delivery = False
+                self.delivery_cost = delivery_settings.fixed_cost
+
+            # Update the total amount after including delivery cost
+            self.total_amount += self.delivery_cost
+
+        except Exception as e:
+            raise ValueError(f"Error calculating delivery cost: {str(e)}")
+
+    def save(self, *args, **kwargs):
+        """Update delivery cost and total amount before saving."""
+        self.calculate_delivery_cost()
+        super().save(*args, **kwargs)
 
 
 class OrderItems(models.Model):
@@ -136,8 +191,8 @@ class OrderItems(models.Model):
         if self.quantity <= 0:
             raise ValidationError(_('Quantity must be greater than zero.'))
 
-        if self.product and self.quantity > self.product.stock:
-            raise ValidationError(_('Quantity exceeds available stock.'))
+        # if self.product and self.quantity > self.product.stock:
+        #     raise ValidationError(_('Quantity exceeds available stock.'))
 
         super().clean()
     
@@ -163,3 +218,19 @@ class OrderItems(models.Model):
                     return coupon
         
         return None
+
+
+
+
+class DeliverySettings(models.Model):
+    fixed_cost = models.IntegerField(default=0, verbose_name=_('Fixed Delivery Cost'))
+    free_delivery_threshold = models.IntegerField(default=0, verbose_name=_('Free Delivery Threshold'))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('Created At'))  # حقل تاريخ الإنشاء
+
+    class Meta:
+        verbose_name = _('Delivery Setting')
+        verbose_name_plural = _('Delivery Settings')
+        ordering = ['-created_at']  # ترتيب السجلات من الأحدث إلى الأقدم
+
+    def __str__(self):
+        return f"{_('Delivery Settings')}: {_('Fixed Cost')} {self.fixed_cost}, {_('Threshold')} {self.free_delivery_threshold}"

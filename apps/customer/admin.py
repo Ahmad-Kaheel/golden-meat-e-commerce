@@ -13,7 +13,7 @@ class UserAdminForm(forms.ModelForm):
 
 class UserAdmin(admin.ModelAdmin):
     form = UserAdminForm
-    list_display = ('email', 'get_full_name', 'is_staff', 'is_active', 'date_joined')
+    list_display = ('email', 'get_full_name', 'is_staff', 'is_active', 'is_blacklisted')
     list_filter = ('is_staff', 'is_active', 'date_joined')
     search_fields = ('email',)
     ordering = ('-date_joined',)
@@ -25,9 +25,9 @@ class UserAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'avatar', 'bio', 'created_at', 'updated_at')
+    list_display = ('user', 'created_at', 'updated_at')
     list_filter = ('created_at',)
-    search_fields = ('user__email', 'bio')
+    search_fields = ('user__email',)
     readonly_fields = ('created_at', 'updated_at')
 
     def get_readonly_fields(self, request, obj=None):

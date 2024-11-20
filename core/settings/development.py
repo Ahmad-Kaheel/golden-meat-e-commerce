@@ -59,30 +59,48 @@ DATABASES = {
 
 """
 {
-    "email": "amin1@amin.com",
-    "password1": "123qweasd_",
-    "password2": "123qweasd_"
+  "email": "customer@example.com",
+  "password1": "CustomerPassword123",
+  "password2": "CustomerPassword123",
+  "is_vendor": false,
+  "first_name": "Alice",
+  "last_name": "Smith",
+  "gender": "female",
+  "date_of_birth": "1990-05-20",
+  "phone_number": "+1987654321"
 }
 
+
 {
-    "email": "amin2@amin.com",
-    "password1": "123qweasd_",
-    "password2": "123qweasd_"
+  "email": "vendor@example.com",
+  "password1": "SecurePassword123",
+  "password2": "SecurePassword123",
+  "is_vendor": true,
+  "company_name": "ABC Trading Co.",
+  "company_type": "Retailer",
+  "commercial_registration_number": "123456789",
+  "tax_number": "987654321",
+  "manager_name": "John Doe",
+  "company_email": "contact@abctrading.com",
+  "mobile_number": "+1234567890",
+  "website": "https://www.abctrading.com",
+  "business_activity": "Wholesale electronics"
 }
+
 
 """
 
 """
 
 {
-	"email": "amin1@amin.com",
-	"password": "123qweasd_"
+  "email": "customer@example.com",
+  "password": "CustomerPassword123"
 }
 
 
 {
-	"email": "amin2@amin.com",
-	"password": "123qweasd_"
+  "email": "vendor@example.com",
+  "password": "SecurePassword123"
 }
 
 """

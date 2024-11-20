@@ -1,16 +1,21 @@
 from drf_spectacular.utils import(extend_schema, extend_schema_view, 
                                   OpenApiParameter, OpenApiExample, OpenApiTypes)
 from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
+from rest_framework import status
 from rest_framework import mixins
 from rest_framework.views import APIView
 
 from django.utils.translation import gettext_lazy as _
+from django.shortcuts import get_object_or_404
+from django.http import HttpResponse, JsonResponse
 
 from order.utils import OrderMixin
+# from order.utils import OrderMixin, generate_invoice_pdf
 from voucher.models import UserCoupon
-from order.serializers import(OrderItemsSerializer, OrderSerializer)
-from order.models import Order
+from order.serializers import(OrderItemsSerializer, OrderSerializer, DeliverySettingsSerializer)
+from order.models import Order, DeliverySettings
 from voucher.models import UserCoupon
 from customer.permissions import IsUserAddressOwner as IsUserOrderOwner
 
@@ -131,3 +136,91 @@ class OrderPaypalPaymentComplete(OrderMixin, APIView):
                 })
             else:
                 return Response({'success': 'You successfully paid for order!'})
+
+
+@extend_schema_view(
+    get=extend_schema(
+        tags=['Orders'],
+        summary="Retrieve all orders for the current user",
+        description="Fetches a list of all orders made by the currently authenticated user, sorted by creation date.",
+        parameters=common_parameters,
+    )
+)
+class UserOrderListView(ListAPIView):
+    """
+    Retrieve all orders for the current authenticated user.
+    """
+    serializer_class = OrderSerializer
+    permission_classes = [IsUserOrderOwner]
+
+    def get_queryset(self):
+        # Filter orders for the currently authenticated user
+        return Order.objects.filter(user=self.request.user).order_by('-created_at')
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        if not queryset.exists():
+            return Response({"detail": "No orders found for the current user."}, status=404)
+        return super().list(request, *args, **kwargs)
+
+
+@extend_schema_view(
+    get=extend_schema(
+        tags=['Orders'],
+        summary="Retrieve details of a specific order",
+        description="Fetch the details of a specific order made by the currently authenticated user using the order ID.",
+        parameters=common_parameters,
+    )
+)
+class UserOrderDetailView(RetrieveAPIView):
+    """
+    Retrieve the details of a specific order for the current authenticated user.
+    """
+    serializer_class = OrderSerializer
+    permission_classes = [IsUserOrderOwner]
+
+    def get_queryset(self):
+        # Restrict to orders belonging to the currently authenticated user
+        return Order.objects.filter(user=self.request.user)
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            return super().retrieve(request, *args, **kwargs)
+        except Order.DoesNotExist:
+            return Response({"detail": "Order not found."}, status=404)
+
+
+
+@extend_schema_view(
+    get=extend_schema(
+        tags=['Orders'],
+        summary="Retrieve delivery settings",
+        description="Fetches the current delivery settings configured in the system. Returns an error if settings are not found.",
+        parameters=common_parameters,
+    )
+)
+class DeliverySettingsView(APIView):
+    def get(self, request, *args, **kwargs):
+        """Retrieve delivery settings."""
+        delivery_settings = DeliverySettings.objects.first()
+        if not delivery_settings:
+            return Response(
+                {"detail": "Delivery settings are not configured."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        serializer = DeliverySettingsSerializer(delivery_settings)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+
+
+
+# def order_invoice_view(request, order_id):
+#     order = get_object_or_404(Order, id=order_id)
+        
+#     if request.user != order.user and not request.user.is_staff:
+#         return JsonResponse({"error": _("You do not have permission to view this order.")}, status=403)
+
+#     return generate_invoice_pdf(order)

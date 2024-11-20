@@ -3,7 +3,7 @@ from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
 
 from order.utils import OrderMixin
-from order.models import Order, OrderItems
+from order.models import Order, OrderItems, DeliverySettings
 from address.serializers import ShippingAddressSerializer, BillingAddressSerializer
 from address.models import ShippingAddress, BillingAddress
 from voucher.models import UserCoupon
@@ -24,7 +24,7 @@ class OrderSerializer(OrderMixin, serializers.ModelSerializer):
     shipping_info = serializers.PrimaryKeyRelatedField(queryset=ShippingAddress.objects.all())
     billing_info = serializers.PrimaryKeyRelatedField(queryset=BillingAddress.objects.all())
     order_items = OrderItemsSerializer(many=True, source='items', read_only=True)
-    coupon = serializers.CharField(write_only=True, required=False, allow_blank=True)  # تغيير حقل القسيمة ليكون نصياً
+    coupon = serializers.CharField(write_only=True, required=False, allow_blank=True)
     payment_method_display = serializers.SerializerMethodField()
     delivery_method_display = serializers.SerializerMethodField()
 
@@ -32,7 +32,7 @@ class OrderSerializer(OrderMixin, serializers.ModelSerializer):
         model = Order
         fields = ('id', 'shipping_info', 'billing_info', 'payment_method', 'delivery_method', 
                   'payment_method_display', 'delivery_method_display', 'coupon', 'comment', 
-                  'total_amount', 'order_items')
+                  'total_amount', 'order_items', 'delivery_cost', 'free_delivery')
         read_only_fields = ['total_amount']
 
     def get_payment_method_display(self, obj):
@@ -80,3 +80,10 @@ class OrderSerializer(OrderMixin, serializers.ModelSerializer):
             ret['coupon'] = instance.coupon.coupon.coupon
 
         return ret
+
+
+
+class DeliverySettingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DeliverySettings
+        fields = ['fixed_cost', 'free_delivery_threshold']

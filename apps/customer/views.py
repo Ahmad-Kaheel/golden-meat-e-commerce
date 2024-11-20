@@ -54,7 +54,7 @@ class UserRegisterationAPIView(RegisterView):
     """
 
     serializer_class = UserRegistrationSerializer
-    permission_classes = [IsNotAuthenticated]
+    # permission_classes = [IsNotAuthenticated]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -85,6 +85,12 @@ class UserLoginAPIView(LoginView):
     """
 
     serializer_class = UserLoginSerializer
+
+    def get_response(self):
+        original_response = super().get_response()
+        user = self.request.user
+        original_response.data["is_vendor"] = user.is_vendor
+        return original_response
 
 
 @extend_schema_view(
@@ -145,11 +151,11 @@ class ProfileAPIView(RetrieveUpdateAPIView):
         user = self.request.user
         language = get_language()
         
-        # You can filter or modify the queryset based on the current language if needed
-        if language == 'ar':
-            return Profile.objects.filter(user=user, bio_ar__isnull=False)
-        else:
-            return Profile.objects.filter(user=user)
+        # # You can filter or modify the queryset based on the current language if needed
+        # if language == 'ar':
+        #     return Profile.objects.filter(user=user, bio_ar__isnull=False)
+        # else:
+        #     return Profile.objects.filter(user=user)
 
 
 

@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 DEBUG = True
 
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '206.81.22.164']
 
 
 REST_FRAMEWORK['DEFAULT_AUTHENTICATION_CLASSES'] += (

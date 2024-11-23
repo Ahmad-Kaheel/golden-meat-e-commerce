@@ -1,5 +1,5 @@
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
+# from reportlab.lib.pagesizes import A4
+# from reportlab.pdfgen import canvas
 from django.http import HttpResponse
 from django.utils.translation import gettext as _
 

@@ -233,6 +233,8 @@ class ProductFilterAPIView(generics.ListAPIView):
         max_price = self.request.query_params.get('max_price')
         category_id = self.request.query_params.get('category_id')
         recommended_for = self.request.query_params.get('recommended_for')
+        only_discounted = self.request.query_params.get('only_discounted') == 'true'
+        order_by = self.request.query_params.get('order_by')
         
 
         user = self.request.user if self.request.user.is_authenticated else None
@@ -244,6 +246,9 @@ class ProductFilterAPIView(generics.ListAPIView):
             max_price,
             category_id,
             recommended_for,
+            only_discounted,
+            order_by
+
         )
 
         language = get_language()

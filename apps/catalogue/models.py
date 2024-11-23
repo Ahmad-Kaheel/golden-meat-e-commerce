@@ -202,6 +202,7 @@ class ProductImage(models.Model):
 
 class Country(models.Model):
     name = models.CharField(_("Country Name"), max_length=100)
+    icon = models.ImageField(_("Country Icon"), upload_to="country_icons/", blank=True, null=True)
 
     class Meta:
         verbose_name = _("Country")

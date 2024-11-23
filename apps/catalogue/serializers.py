@@ -7,15 +7,22 @@ from catalogue.models import (
     Product,
     Category,
     Review,
-    ProductSpecification
+    ProductSpecification,
+    Country
 )
+
+
+class CountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        fields = ['id', 'name', 'icon']
 
 
 class ProductCategoryReadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = [
-            'id', 'name', 'description', 'created_at'
+            'id', 'name', 'icon', 'description', 'created_at'
         ]
 
     def clean_text_field(self, value):

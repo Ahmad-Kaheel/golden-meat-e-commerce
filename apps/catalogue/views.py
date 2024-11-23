@@ -4,6 +4,9 @@ from drf_spectacular.utils import(
     OpenApiParameter, OpenApiExample
 ) 
 from rest_framework import permissions, viewsets
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
@@ -12,11 +15,12 @@ from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 from django.db.models import Q
 
-from catalogue.models import Product, Category, Review
+from catalogue.models import Product, Category, Review, Country
 from catalogue.serializers import (
     ProductCategoryReadSerializer,
     ProductReadSerializer,
     ReviewSerializer,
+    CountrySerializer
 )
 from customer.permissions import IsUserAddressOwner as IsReviewOwnerOrAdmin
 
@@ -37,8 +41,27 @@ common_parameters = [
 
 
 @extend_schema_view(
+    get=extend_schema(
+        tags=['Product Filter'],
+        summary="List all countries",
+        description="Retrieve a list of all countries along with their icons.",
+        parameters=common_parameters
+    )
+)
+class CountryListView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        countries = Country.objects.all()
+        serializer = CountrySerializer(countries, many=True)
+        return Response(serializer.data)
+
+
+
+@extend_schema_view(
     list=extend_schema(
-        tags=['Category and Product'],
+        # tags=['Category and Product'],
+        tags=['Product Filter'],
         summary="List product categories",
         description="Retrieve a list of all product categories that are available.",
         parameters=common_parameters

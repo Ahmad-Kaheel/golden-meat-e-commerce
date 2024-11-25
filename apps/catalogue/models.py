@@ -45,9 +45,9 @@ class Category(MPTTModel):
     )
 
     is_wholesale = models.BooleanField(
-        _("Is wholesale"),
+        _("B2B"),
         default=False,
-        help_text=_("Indicates if this category is available for wholesale.")
+        help_text=_("Indicates if this category is available for B2B.")
     )
 
     created_at = models.DateTimeField(_("Created At"), auto_now_add=True)
@@ -104,9 +104,9 @@ class Product(models.Model):
         help_text=_("Show this product in search results and catalogue listings."),
     )
     is_wholesale = models.BooleanField(
-        _("Is wholesale"),
+        _("B2B"),
         default=False,
-        help_text=_("Indicates if this product is available for wholesale.")
+        help_text=_("Indicates if this product is available for B2B.")
     )
     categories = models.ManyToManyField(
         Category, verbose_name=_("Categories"), 
